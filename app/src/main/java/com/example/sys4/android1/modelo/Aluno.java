@@ -1,25 +1,51 @@
 package com.example.sys4.android1.modelo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 
 /**
  * Created by sys4 on 01/06/18.
  */
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Aluno implements Serializable{
-    private Long id;
+
+
+    private String id;
     private String nome;
     private String endereco;
     private String telefone;
     private String site;
     private Double nota;
     private String caminhoFoto;
+    private int desativado;
+    private int sincronizado;
 
-    public Long getId() {
+    public int getSincronizado() {
+        return sincronizado;
+    }
+
+    public void setSincronizado(int sincronizado) {
+        this.sincronizado = sincronizado;
+    }
+
+    public int getDesativado() {
+        return desativado;
+    }
+
+    public void setDesativado(int desativado) {
+        this.desativado = desativado;
+    }
+
+    //    @JsonProperty("idCliente")
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+//    @JsonProperty("idCliente")
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -73,6 +99,33 @@ public class Aluno implements Serializable{
 
     @Override
     public String toString() {
-        return getId() + " - " + getNome();
+        return "Aluno{" +
+                "id='" + id + '\'' +
+                ", nome='" + nome + '\'' +
+                ", endereco='" + endereco + '\'' +
+                ", telefone='" + telefone + '\'' +
+                ", site='" + site + '\'' +
+                ", nota=" + nota +
+                ", caminhoFoto='" + caminhoFoto + '\'' +
+                ", desativado=" + desativado +
+                ", sincronizado=" + sincronizado +
+                '}';
+    }
+
+    public boolean estaDesativado() {
+        return this.desativado == 1;
+    }
+
+    public void sincroniza() {
+        this.sincronizado = 1;
+    }
+
+    public void desincroniza() {
+        this.sincronizado = 0;
+    }
+
+    public void desativa() {
+        this.desativado = 1;
+        desincroniza();
     }
 }

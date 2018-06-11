@@ -11,11 +11,23 @@ import java.util.List;
  */
 
 public class AlunoConverter {
-    public String converteParaYaml(List<Aluno> alunos) {
+    public String converteParaJson(List<Aluno> alunos) {
         ObjectMapper mapper = new ObjectMapper();
         String json = "";
         try {
             json = mapper.writeValueAsString(alunos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        System.out.println(yaml);
+
+        return json;
+    }
+    public String converteParaJson(Aluno aluno) {
+        ObjectMapper mapper = new ObjectMapper();
+        String json = "";
+        try {
+            json = mapper.writeValueAsString(aluno);
         } catch (IOException e) {
             e.printStackTrace();
         }

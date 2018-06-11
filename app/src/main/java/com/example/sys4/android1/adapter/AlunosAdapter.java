@@ -42,7 +42,7 @@ public class AlunosAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int i) {
-        return alunos.get(i).getId();
+        return 0;
     }
 
     @Override
@@ -71,9 +71,11 @@ public class AlunosAdapter extends BaseAdapter {
 
         if(aluno.getCaminhoFoto() != null) {
             Bitmap bitmap = BitmapFactory.decodeFile(aluno.getCaminhoFoto());
-            Bitmap bitmapreduzido = Bitmap.createScaledBitmap(bitmap, 100, 100, true);
-            campoFoto.setImageBitmap(bitmapreduzido);
-            campoFoto.setScaleType(ImageView.ScaleType.FIT_XY);
+            if(bitmap != null) {
+                Bitmap bitmapreduzido = Bitmap.createScaledBitmap(bitmap, 100, 100, true);
+                campoFoto.setImageBitmap(bitmapreduzido);
+                campoFoto.setScaleType(ImageView.ScaleType.FIT_XY);
+            }
         }
         return listView;
     }

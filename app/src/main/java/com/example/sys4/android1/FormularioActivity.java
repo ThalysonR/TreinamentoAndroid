@@ -21,8 +21,14 @@ import android.widget.Toast;
 import com.example.sys4.android1.dao.AlunoDAO;
 import com.example.sys4.android1.modelo.Aluno;
 import com.example.sys4.android1.providers.GenericFileProvider;
+import com.example.sys4.android1.retrofit.RetrofitInicializador;
+import com.example.sys4.android1.tasks.InsereAlunoTask;
 
 import java.io.File;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class FormularioActivity extends AppCompatActivity {
@@ -85,6 +91,7 @@ public class FormularioActivity extends AppCompatActivity {
             case R.id.menu_formulario_ok: {
 
                 Aluno aluno = helper.getAluno();
+                aluno.desincroniza();
                 AlunoDAO dao = new AlunoDAO(this);
                 if(aluno.getId() != null) {
                     dao.update(aluno);
@@ -92,7 +99,21 @@ public class FormularioActivity extends AppCompatActivity {
                     dao.insert(aluno);
                 }
 
-                Toast.makeText(FormularioActivity.this, "Aluno " + aluno.getNome() + " salvo!", Toast.LENGTH_SHORT).show();
+//                new InsereAlunoTask(aluno).execute();
+                Call call = new RetrofitInicializador().getAlunoService().insere(aluno);
+                call.enqueue(new Callback<Aluno>() {
+                    @Override
+                    public void onResponse(Call call, Response response) {
+                        Toast.makeText(FormularioActivity.this, "Salvo no servidor", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(Call call, Throwable t) {
+                        Toast.makeText(FormularioActivity.this, "Deu ruim", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                Toast.makeText(FormularioActivity.this, "Aluno " + aluno.getNome() + " - " + aluno.getId() + " salvo!", Toast.LENGTH_SHORT).show();
 
 
                 finish();

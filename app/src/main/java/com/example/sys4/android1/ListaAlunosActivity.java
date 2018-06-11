@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,23 +19,40 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.sys4.android1.adapter.AlunosAdapter;
-import com.example.sys4.android1.converter.AlunoConverter;
 import com.example.sys4.android1.dao.AlunoDAO;
+import com.example.sys4.android1.event.AtualizaListaAlunoEvent;
 import com.example.sys4.android1.modelo.Aluno;
+import com.example.sys4.android1.sync.AlunoSincronizador;
 
-import java.io.IOException;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.List;
 
 public class ListaAlunosActivity extends AppCompatActivity {
 
+    private final AlunoSincronizador sincronizador = new AlunoSincronizador(this);
     private ListView listaAlunos;
+    private SwipeRefreshLayout swipe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_alunos);
 
-//        listar();
+        EventBus eventBus = EventBus.getDefault();
+        eventBus.register(this);
+
+        swipe = findViewById(R.id.swipe_lista_aluno);
+
+        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                sincronizador.buscaTodos();
+            }
+        });
+
         listaAlunos = findViewById(R.id.lista_alunos);
         listaAlunos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -42,7 +61,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
                 Intent intentVaiProFormulario = new Intent(ListaAlunosActivity.this, FormularioActivity.class);
                 intentVaiProFormulario.putExtra("aluno", aluno);
                 startActivity(intentVaiProFormulario);
-//                Toast.makeText(ListaAlunosActivity.this, aluno.getNota().toString(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(ListaAlunosActivity.this, aluno.getDesativado(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -56,11 +75,24 @@ public class ListaAlunosActivity extends AppCompatActivity {
         });
 
         registerForContextMenu(listaAlunos);
+        sincronizador.buscaTodos();
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void atualizaListaAlunoEvent(AtualizaListaAlunoEvent event){
+        if(swipe.isRefreshing()) {
+            swipe.setRefreshing(false);
+        }
+        listar();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+
+
         listar();
     }
 
@@ -92,6 +124,10 @@ public class ListaAlunosActivity extends AppCompatActivity {
     private void listar() {
         AlunoDAO dao = new AlunoDAO(this);
         List<Aluno> alunos = dao.findAll();
+        for (Aluno aluno :
+                alunos) {
+            Log.i("Sincronizado", "listar: " + aluno.getSincronizado());
+        }
 //        ArrayAdapter<Aluno> adapter = new ArrayAdapter<Aluno>(this, R.layout.list_item, alunos);
         AlunosAdapter adapter = new AlunosAdapter(this, alunos);
         listaAlunos.setAdapter(adapter);
@@ -146,16 +182,21 @@ public class ListaAlunosActivity extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem menuItem) {
 
                 AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);
-                if (dao.delete(aluno.getId())) {
+                if (dao.delete(aluno)) {
                     Toast.makeText(ListaAlunosActivity.this, aluno.getNome() + " deletado.", Toast.LENGTH_SHORT).show();
                     listar();
                 } else {
                     Toast.makeText(ListaAlunosActivity.this, "Falha ao deletar aluno selecionado.", Toast.LENGTH_SHORT).show();
                 }
 
-                return true;
+                sincronizador.deleta(aluno);
+                Log.i("OnDelete", "Aluno após delete: " + aluno.toString());
+                return false;
             }
+
         });
 
+
     }
+
 }

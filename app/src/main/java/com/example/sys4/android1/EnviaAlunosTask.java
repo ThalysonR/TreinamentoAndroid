@@ -3,7 +3,6 @@ package com.example.sys4.android1;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.sys4.android1.converter.AlunoConverter;
@@ -36,7 +35,7 @@ public class EnviaAlunosTask extends AsyncTask<Object, Object, String> {
         List<Aluno> alunos = dao.findAll();
 
         AlunoConverter conversor = new AlunoConverter();
-        String json = conversor.converteParaYaml(alunos);
+        String json = conversor.converteParaJson(alunos);
 
         Webclient client = new Webclient();
         String resposta = "";

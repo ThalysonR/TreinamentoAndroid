@@ -3,7 +3,6 @@ package com.example.sys4.android1;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
@@ -13,7 +12,12 @@ import java.util.Scanner;
 
 public class Webclient {
     public String post(String json) throws IOException {
-        URL url = new URL("https://www.caelum.com.br/mobile/");
+        String endereco = "https://www.caelum.com.br/mobile/";
+        return realizaConexao(json, endereco);
+    }
+
+    public String realizaConexao(String json, String endereco) throws IOException {
+        URL url = new URL(endereco);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("Content-type", "application/json");
         connection.setRequestProperty("Accept", "application/json");
@@ -26,5 +30,10 @@ public class Webclient {
         String resposta = scanner.next();
 
         return resposta;
+    }
+
+    public String insere(String json) throws IOException {
+        String endereco = "http://10.0.2.2:8080/api/aluno";
+        return realizaConexao(json, endereco);
     }
 }

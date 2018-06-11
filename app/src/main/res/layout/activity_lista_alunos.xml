@@ -26,11 +26,19 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ListView
+    <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/lista_alunos">
-    </ListView>
+        android:layout_height="wrap_content"
+        android:id="@+id/swipe_lista_aluno">
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/lista_alunos">
+        </ListView>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
 
     <Button
         android:layout_width="56dp"
